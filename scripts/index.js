@@ -1,4 +1,4 @@
-// Etapa 1
+// Projeto 8 Etapa 1
 
 let initialCards = [
   {
@@ -27,7 +27,7 @@ let initialCards = [
   },
 ];
 
-// Etapa 2
+// Projeto 8 Etapa 2
 
 const profileEditBtn = document.querySelector(".profile__edit-button");
 const modal = document.querySelector("#edit-popup");
@@ -35,7 +35,15 @@ const closeBtn = modal.querySelector(".popup__close");
 
 function openModal(modal) {
   modal.classList.add("popup_is-opened");
+
+  const sendButton = modal.querySelector(".popup__button");
+
+  sendButton.classList.add("popup__button_disabled");
+  sendButton.setAttribute("disabled", true);
+
+  resetFormValidation(modal);
 }
+
 function closeModal(modal) {
   modal.classList.remove("popup_is-opened");
 }
@@ -73,7 +81,7 @@ function handleProfileFormSubmit(evt) {
 
 modal.addEventListener("submit", handleProfileFormSubmit);
 
-// Etapa final
+// Projeto 8 Etapa final
 
 const cardTemplate = document.querySelector("#card-template").content;
 
@@ -86,10 +94,7 @@ imagePopupCloseBtn.addEventListener("click", function () {
   closeModal(imagePopup);
 });
 
-function getCardElement(
-  name = "Lugar sem nome",
-  link = "./images/placeholder.jpg",
-) {
+function getCardElement(name, link) {
   const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
   const cardImage = cardElement.querySelector(".card__image");
   const cardTitle = cardElement.querySelector(".card__title");
@@ -162,3 +167,91 @@ function handleCardFormSubmit(evt) {
 }
 
 newCardModal.addEventListener("submit", handleCardFormSubmit);
+
+// Projeto 9 Etapa 1 e 2
+
+function showInputError(input, errorMessage) {
+  const errorElement = document.querySelector(`#${input.id}-error`);
+  input.classList.add("popup__input_type_error");
+  errorElement.textContent = errorMessage;
+  errorElement.classList.add("popup__error_visible");
+}
+
+function hideInputError(formElement, input) {
+  const errorElement = formElement.querySelector(`#${input.id}-error`);
+  input.classList.remove("popup__input_type_error");
+  errorElement.textContent = "";
+  errorElement.classList.remove("popup__error_visible");
+}
+
+function hasInvalidInput(inputList) {
+  return Array.from(inputList).some((input) => !input.validity.valid);
+}
+
+function toggleButtonState(inputList, buttonElement) {
+  if (hasInvalidInput(inputList)) {
+    buttonElement.classList.add("popup__button_disabled");
+    buttonElement.setAttribute("disabled", true);
+  } else {
+    buttonElement.classList.remove("popup__button_disabled");
+    buttonElement.removeAttribute("disabled");
+  }
+}
+
+function setEventListeners(formElement) {
+  const inputs = formElement.querySelectorAll(".popup__input");
+  const saveButton = formElement.querySelector(".popup__button");
+
+  inputs.forEach((input) => {
+    input.addEventListener("input", function () {
+      if (!input.validity.valid) {
+        showInputError(input, input.validationMessage);
+      } else {
+        hideInputError(formElement, input);
+      }
+
+      toggleButtonState(inputs, saveButton);
+    });
+  });
+
+  formElement.addEventListener("submit", function (evt) {
+    if (!formElement.checkValidity()) {
+      evt.preventDefault();
+    }
+  });
+}
+
+const forms = document.querySelectorAll(".popup__form");
+
+forms.forEach((form) => {
+  setEventListeners(form);
+});
+
+// Projeto 9 Etapa 3
+
+const overlay = document.querySelectorAll(".popup");
+
+overlay.forEach((popup) => {
+  popup.addEventListener("click", function (event) {
+    if (event.target === popup) {
+      closeModal(popup);
+    }
+  });
+});
+
+// Projeto 9 Etapa 4
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") {
+    closeModal(document.querySelector(".popup_is-opened"));
+  }
+});
+
+// Extra: redefinir a validação dos formulários
+
+function resetFormValidation(formElement) {
+  const inputs = formElement.querySelectorAll(".popup__input");
+  inputs.forEach((input) => {
+    hideInputError(formElement, input);
+  });
+}

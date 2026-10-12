@@ -157,3 +157,30 @@
     padding: 0;
   }
 }
+
+/* MENSAGENS DE ERRO */
+
+.popup__error {
+  display: none;
+  font-size: 12px;
+  font-weight: 400;
+  color: #ff0000;
+}
+
+.popup__error_visible {
+  display: block;
+}
+
+.popup__input_type_error {
+  border-bottom: 1px solid #ff0000;
+}
+
+.popup__button_disabled {
+  background-color: #fff;
+  border: 1px solid gray;
+  color: gray;
+}
+
+.popup__field {
+  position: relative;
+}
