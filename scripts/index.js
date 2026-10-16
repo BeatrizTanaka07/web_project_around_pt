@@ -1,6 +1,6 @@
 // Projeto 8 Etapa 1
 
-let initialCards = [
+const initialCards = [
   {
     name: "Vale de Yosemite",
     link: "https://practicum-content.s3.us-west-1.amazonaws.com/web-code/moved_yosemite.jpg",
@@ -29,36 +29,39 @@ let initialCards = [
 
 // Projeto 8 Etapa 2
 
-const profileEditBtn = document.querySelector(".profile__edit-button");
-const modal = document.querySelector("#edit-popup");
-const closeBtn = modal.querySelector(".popup__close");
+const editProfileBtn = document.querySelector(".profile__edit-button");
+const editProfilePopup = document.querySelector("#edit-popup");
 
 function openModal(modal) {
   modal.classList.add("popup_is-opened");
 
-  const sendButton = modal.querySelector(".popup__button");
+  const submitBtn = modal.querySelectorAll(".popup__button");
+  if (submitBtn) {
+    submitBtn.forEach((btn) => {
+      btn.classList.add("popup__button_disabled");
+      btn.setAttribute("disabled", true);
+      resetFormValidation(modal);
+    });
+  }
 
-  sendButton.classList.add("popup__button_disabled");
-  sendButton.setAttribute("disabled", true);
-
-  resetFormValidation(modal);
+  document.addEventListener("keydown", handleEscClose);
 }
 
 function closeModal(modal) {
   modal.classList.remove("popup_is-opened");
+  document.removeEventListener("keydown", handleEscClose);
 }
 
-profileEditBtn.addEventListener("click", function () {
+editProfileBtn.addEventListener("click", function () {
   handleOpenEditModal();
-});
-closeBtn.addEventListener("click", function () {
-  closeModal(modal);
 });
 
 const profileTitle = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
-const modalTitle = modal.querySelector(".popup__input.popup__input_type_name");
-const modalDescription = modal.querySelector(
+const modalTitle = editProfilePopup.querySelector(
+  ".popup__input.popup__input_type_name",
+);
+const modalDescription = editProfilePopup.querySelector(
   ".popup__input.popup__input_type_description",
 );
 
@@ -69,30 +72,33 @@ function fillProfileForm() {
 
 function handleOpenEditModal() {
   fillProfileForm();
-  openModal(modal);
+  openModal(editProfilePopup);
 }
 
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
   profileTitle.textContent = modalTitle.value;
   profileDescription.textContent = modalDescription.value;
-  closeModal(modal);
+  closeModal(editProfilePopup);
 }
 
-modal.addEventListener("submit", handleProfileFormSubmit);
+const closeBtn = document.querySelectorAll(".popup__close");
+
+closeBtn.forEach((btn) => {
+  btn.addEventListener("click", function () {
+    closeModal(btn.closest(".popup"));
+  });
+});
+
+editProfilePopup.addEventListener("submit", handleProfileFormSubmit);
 
 // Projeto 8 Etapa final
 
 const cardTemplate = document.querySelector("#card-template").content;
 
 const imagePopup = document.querySelector("#image-popup");
-const imagePopupCloseBtn = imagePopup.querySelector(".popup__close");
 const imagePopupImage = imagePopup.querySelector(".popup__image");
 const imagePopupCaption = imagePopup.querySelector(".popup__caption");
-
-imagePopupCloseBtn.addEventListener("click", function () {
-  closeModal(imagePopup);
-});
 
 function getCardElement(name, link) {
   const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
@@ -142,13 +148,9 @@ initialCards.forEach(function (card) {
 
 const newCardBtn = document.querySelector(".profile__add-button");
 const newCardModal = document.querySelector("#new-card-popup");
-const newCardCloseBtn = newCardModal.querySelector(".popup__close");
 
 newCardBtn.addEventListener("click", function () {
   openModal(newCardModal);
-});
-newCardCloseBtn.addEventListener("click", function () {
-  closeModal(newCardModal);
 });
 
 function handleCardFormSubmit(evt) {
@@ -170,8 +172,8 @@ newCardModal.addEventListener("submit", handleCardFormSubmit);
 
 // Projeto 9 Etapa 1 e 2
 
-function showInputError(input, errorMessage) {
-  const errorElement = document.querySelector(`#${input.id}-error`);
+function showInputError(formElement, input, errorMessage) {
+  const errorElement = formElement.querySelector(`#${input.id}-error`);
   input.classList.add("popup__input_type_error");
   errorElement.textContent = errorMessage;
   errorElement.classList.add("popup__error_visible");
@@ -205,7 +207,7 @@ function setEventListeners(formElement) {
   inputs.forEach((input) => {
     input.addEventListener("input", function () {
       if (!input.validity.valid) {
-        showInputError(input, input.validationMessage);
+        showInputError(formElement, input, input.validationMessage);
       } else {
         hideInputError(formElement, input);
       }
@@ -229,9 +231,9 @@ forms.forEach((form) => {
 
 // Projeto 9 Etapa 3
 
-const overlay = document.querySelectorAll(".popup");
+const popupList = document.querySelectorAll(".popup");
 
-overlay.forEach((popup) => {
+popupList.forEach((popup) => {
   popup.addEventListener("click", function (event) {
     if (event.target === popup) {
       closeModal(popup);
@@ -241,11 +243,14 @@ overlay.forEach((popup) => {
 
 // Projeto 9 Etapa 4
 
-document.addEventListener("keydown", function (event) {
+function handleEscClose(event) {
   if (event.key === "Escape") {
-    closeModal(document.querySelector(".popup_is-opened"));
+    const openedPopup = document.querySelector(".popup_is-opened");
+    if (openedPopup) {
+      closeModal(openedPopup);
+    }
   }
-});
+}
 
 // Extra: redefinir a validação dos formulários
 
@@ -253,5 +258,8 @@ function resetFormValidation(formElement) {
   const inputs = formElement.querySelectorAll(".popup__input");
   inputs.forEach((input) => {
     hideInputError(formElement, input);
+    if (newCardModal.contains(input)) {
+      input.value = "";
+    }
   });
 }
