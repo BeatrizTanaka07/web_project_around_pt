@@ -29,33 +29,6 @@ const initialCards = [
 
 // Projeto 8 Etapa 2
 
-const editProfileBtn = document.querySelector(".profile__edit-button");
-const editProfilePopup = document.querySelector("#edit-popup");
-
-function openModal(modal) {
-  modal.classList.add("popup_is-opened");
-
-  const submitBtn = modal.querySelectorAll(".popup__button");
-  if (submitBtn) {
-    submitBtn.forEach((btn) => {
-      btn.classList.add("popup__button_disabled");
-      btn.setAttribute("disabled", true);
-      resetFormValidation(modal);
-    });
-  }
-
-  document.addEventListener("keydown", handleEscClose);
-}
-
-function closeModal(modal) {
-  modal.classList.remove("popup_is-opened");
-  document.removeEventListener("keydown", handleEscClose);
-}
-
-editProfileBtn.addEventListener("click", function () {
-  handleOpenEditModal();
-});
-
 const profileTitle = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
 const modalTitle = editProfilePopup.querySelector(
@@ -70,11 +43,6 @@ function fillProfileForm() {
   modalDescription.value = profileDescription.textContent;
 }
 
-function handleOpenEditModal() {
-  fillProfileForm();
-  openModal(editProfilePopup);
-}
-
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
   profileTitle.textContent = modalTitle.value;
@@ -82,93 +50,7 @@ function handleProfileFormSubmit(evt) {
   closeModal(editProfilePopup);
 }
 
-const closeBtn = document.querySelectorAll(".popup__close");
-
-closeBtn.forEach((btn) => {
-  btn.addEventListener("click", function () {
-    closeModal(btn.closest(".popup"));
-  });
-});
-
 editProfilePopup.addEventListener("submit", handleProfileFormSubmit);
-
-// Projeto 8 Etapa final
-
-const cardTemplate = document.querySelector("#card-template").content;
-
-const imagePopup = document.querySelector("#image-popup");
-const imagePopupImage = imagePopup.querySelector(".popup__image");
-const imagePopupCaption = imagePopup.querySelector(".popup__caption");
-
-function getCardElement(name, link) {
-  const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
-  const cardImage = cardElement.querySelector(".card__image");
-  const cardTitle = cardElement.querySelector(".card__title");
-
-  cardImage.src = link;
-  cardImage.alt = name;
-  cardTitle.textContent = name;
-
-  const likeButton = cardElement.querySelector(".card__like-button");
-
-  likeButton.addEventListener("click", function () {
-    likeButton.classList.toggle("card__like-button_is-active");
-  });
-
-  const deleteButton = cardElement.querySelector(".card__delete-button");
-
-  deleteButton.addEventListener("click", function () {
-    cardElement.remove();
-  });
-
-  cardImage.addEventListener("click", function () {
-    imagePopupCaption.textContent = name;
-    imagePopupImage.src = link;
-    imagePopupImage.alt = name;
-    openModal(imagePopup);
-  });
-
-  return cardElement;
-}
-
-function renderCard(name, link, container, method) {
-  const cardEl = getCardElement(name, link);
-  if (method === "append") {
-    container.append(cardEl);
-  } else {
-    container.prepend(cardEl);
-  }
-}
-
-const cardsContainer = document.querySelector(".cards__list");
-
-initialCards.forEach(function (card) {
-  renderCard(card.name, card.link, cardsContainer, "append");
-});
-
-const newCardBtn = document.querySelector(".profile__add-button");
-const newCardModal = document.querySelector("#new-card-popup");
-
-newCardBtn.addEventListener("click", function () {
-  openModal(newCardModal);
-});
-
-function handleCardFormSubmit(evt) {
-  evt.preventDefault();
-
-  const name = newCardModal.querySelector(
-    ".popup__input.popup__input_type_card-name",
-  ).value;
-  const link = newCardModal.querySelector(
-    ".popup__input.popup__input_type_url",
-  ).value;
-
-  renderCard(name, link, cardsContainer, "prepend");
-
-  closeModal(newCardModal);
-}
-
-newCardModal.addEventListener("submit", handleCardFormSubmit);
 
 // Projeto 9 Etapa 1 e 2
 
@@ -263,3 +145,43 @@ function resetFormValidation(formElement) {
     }
   });
 }
+
+export function renderCard(name, link, container, method) {
+  const card = new Card(name, link, "#card-template");
+  const cardEl = card.getCardElement();
+  if (method === "append") {
+    container.append(cardEl);
+  } else {
+    container.prepend(cardEl);
+  }
+}
+
+const cardsContainer = document.querySelector(".cards__list");
+
+initialCards.forEach((card) => {
+  renderCard(card.name, card.link, cardsContainer, "append");
+});
+
+const newCardBtn = document.querySelector(".profile__add-button");
+const newCardModal = document.querySelector("#new-card-popup");
+
+newCardBtn.addEventListener("click", () => {
+  openModal(newCardModal);
+});
+
+function handleCardFormSubmit(evt) {
+  evt.preventDefault();
+
+  const name = newCardModal.querySelector(
+    ".popup__input.popup__input_type_card-name",
+  ).value;
+  const link = newCardModal.querySelector(
+    ".popup__input.popup__input_type_url",
+  ).value;
+
+  renderCard(name, link, cardsContainer, "prepend");
+
+  closeModal(newCardModal);
+}
+
+newCardModal.addEventListener("submit", handleCardFormSubmit);
