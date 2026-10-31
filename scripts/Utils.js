@@ -1,6 +1,6 @@
-// openModal e closeModal
+// openModal and closeModal
 
-export function openModal(modal) {
+function openModal(modal, fn) {
   modal.classList.add("popup_is-opened");
 
   const submitBtn = modal.querySelectorAll(".popup__button");
@@ -8,8 +8,11 @@ export function openModal(modal) {
     submitBtn.forEach((btn) => {
       btn.classList.add("popup__button_disabled");
       btn.setAttribute("disabled", true);
-      resetFormValidation(modal);
     });
+  }
+
+  if (fn) {
+    fn(modal);
   }
 
   document.addEventListener("keydown", handleEscClose);
@@ -30,16 +33,40 @@ closeBtn.forEach((btn) => {
   });
 });
 
-// open edit profile modal
+// close modal on overlay click
 
-const editProfileBtn = document.querySelector(".profile__edit-button");
-const editProfilePopup = document.querySelector("#edit-popup");
+const popupList = document.querySelectorAll(".popup");
 
-function handleOpenEditModal() {
-  fillProfileForm();
-  openModal(editProfilePopup);
+popupList.forEach((popup) => {
+  popup.addEventListener("click", function (event) {
+    if (event.target === popup) {
+      closeModal(popup);
+    }
+  });
+});
+
+// close modal on ESC key press
+
+function handleEscClose(event) {
+  if (event.key === "Escape") {
+    const openedPopup = document.querySelector(".popup_is-opened");
+    if (openedPopup) {
+      closeModal(openedPopup);
+    }
+  }
 }
 
-editProfileBtn.addEventListener("click", function () {
-  handleOpenEditModal();
-});
+// reset form validation
+
+function resetFormValidation(formElement, config) {
+  const inputs = formElement.querySelectorAll(config.inputSelector);
+  inputs.forEach((input) => {
+    const errorElement = formElement.querySelector(`#${input.id}-error`);
+    input.classList.remove(config.inputErrorClass);
+    errorElement.textContent = "";
+    errorElement.classList.remove(config.errorClass);
+    input.value = "";
+  });
+}
+
+export { openModal, closeModal, resetFormValidation };

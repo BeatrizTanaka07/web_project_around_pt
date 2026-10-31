@@ -1,4 +1,6 @@
-// Projeto 8 Etapa 1
+import { Card } from "./Card.js";
+import { FormValidator } from "./FormValidator.js";
+import { openModal, closeModal, resetFormValidation } from "./utils.js";
 
 const initialCards = [
   {
@@ -27,7 +29,17 @@ const initialCards = [
   },
 ];
 
-// Projeto 8 Etapa 2
+const config = {
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__error_visible",
+  inactiveButtonClass: "popup__button_disabled",
+};
+
+// Edit Profile Modal
+
+const editProfilePopup = document.querySelector("#edit-popup");
 
 const profileTitle = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
@@ -43,6 +55,20 @@ function fillProfileForm() {
   modalDescription.value = profileDescription.textContent;
 }
 
+const editProfileForm = editProfilePopup.querySelector("#edit-profile-form");
+
+function handleOpenEditModal() {
+  resetFormValidation(editProfileForm, config);
+  fillProfileForm();
+  openModal(editProfilePopup);
+}
+
+const editProfileBtn = document.querySelector(".profile__edit-button");
+
+editProfileBtn.addEventListener("click", function () {
+  handleOpenEditModal();
+});
+
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
   profileTitle.textContent = modalTitle.value;
@@ -52,101 +78,9 @@ function handleProfileFormSubmit(evt) {
 
 editProfilePopup.addEventListener("submit", handleProfileFormSubmit);
 
-// Projeto 9 Etapa 1 e 2
+// Card rendering and New Card Modal
 
-function showInputError(formElement, input, errorMessage) {
-  const errorElement = formElement.querySelector(`#${input.id}-error`);
-  input.classList.add("popup__input_type_error");
-  errorElement.textContent = errorMessage;
-  errorElement.classList.add("popup__error_visible");
-}
-
-function hideInputError(formElement, input) {
-  const errorElement = formElement.querySelector(`#${input.id}-error`);
-  input.classList.remove("popup__input_type_error");
-  errorElement.textContent = "";
-  errorElement.classList.remove("popup__error_visible");
-}
-
-function hasInvalidInput(inputList) {
-  return Array.from(inputList).some((input) => !input.validity.valid);
-}
-
-function toggleButtonState(inputList, buttonElement) {
-  if (hasInvalidInput(inputList)) {
-    buttonElement.classList.add("popup__button_disabled");
-    buttonElement.setAttribute("disabled", true);
-  } else {
-    buttonElement.classList.remove("popup__button_disabled");
-    buttonElement.removeAttribute("disabled");
-  }
-}
-
-function setEventListeners(formElement) {
-  const inputs = formElement.querySelectorAll(".popup__input");
-  const saveButton = formElement.querySelector(".popup__button");
-
-  inputs.forEach((input) => {
-    input.addEventListener("input", function () {
-      if (!input.validity.valid) {
-        showInputError(formElement, input, input.validationMessage);
-      } else {
-        hideInputError(formElement, input);
-      }
-
-      toggleButtonState(inputs, saveButton);
-    });
-  });
-
-  formElement.addEventListener("submit", function (evt) {
-    if (!formElement.checkValidity()) {
-      evt.preventDefault();
-    }
-  });
-}
-
-const forms = document.querySelectorAll(".popup__form");
-
-forms.forEach((form) => {
-  setEventListeners(form);
-});
-
-// Projeto 9 Etapa 3
-
-const popupList = document.querySelectorAll(".popup");
-
-popupList.forEach((popup) => {
-  popup.addEventListener("click", function (event) {
-    if (event.target === popup) {
-      closeModal(popup);
-    }
-  });
-});
-
-// Projeto 9 Etapa 4
-
-function handleEscClose(event) {
-  if (event.key === "Escape") {
-    const openedPopup = document.querySelector(".popup_is-opened");
-    if (openedPopup) {
-      closeModal(openedPopup);
-    }
-  }
-}
-
-// Extra: redefinir a validação dos formulários
-
-function resetFormValidation(formElement) {
-  const inputs = formElement.querySelectorAll(".popup__input");
-  inputs.forEach((input) => {
-    hideInputError(formElement, input);
-    if (newCardModal.contains(input)) {
-      input.value = "";
-    }
-  });
-}
-
-export function renderCard(name, link, container, method) {
+function renderCard(name, link, container, method) {
   const card = new Card(name, link, "#card-template");
   const cardEl = card.getCardElement();
   if (method === "append") {
@@ -162,12 +96,7 @@ initialCards.forEach((card) => {
   renderCard(card.name, card.link, cardsContainer, "append");
 });
 
-const newCardBtn = document.querySelector(".profile__add-button");
 const newCardModal = document.querySelector("#new-card-popup");
-
-newCardBtn.addEventListener("click", () => {
-  openModal(newCardModal);
-});
 
 function handleCardFormSubmit(evt) {
   evt.preventDefault();
@@ -185,3 +114,19 @@ function handleCardFormSubmit(evt) {
 }
 
 newCardModal.addEventListener("submit", handleCardFormSubmit);
+
+const newCardBtn = document.querySelector(".profile__add-button");
+const newCardForm = newCardModal.querySelector("#new-card-form");
+
+newCardBtn.addEventListener("click", () => {
+  openModal(newCardModal, () => {
+    resetFormValidation(newCardForm, config);
+  });
+});
+
+const forms = document.querySelectorAll(".popup__form");
+
+forms.forEach((form) => {
+  const formValidator = new FormValidator(config, form);
+  formValidator.setEventListeners();
+});
