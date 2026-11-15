@@ -10,7 +10,7 @@ Projeto de aprofundamento de habilidades técnicas em JavaScript: utilizando o e
 - CSS -- Estilização
 - JavaScript -- Programação
 - GitHub -- Controle de versão e hospedagem do código
-- Método POO -- Para os arquivos FormValidator.js e Card.js
+- Método POO -- Paradigma utilizado para organizar o código de programação (JavaScript), sendo eles os arquivos do diretório "components" e o index.js.
 
 ## Link para o GitHub Pages
 
