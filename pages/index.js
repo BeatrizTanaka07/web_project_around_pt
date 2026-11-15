@@ -51,7 +51,6 @@ const userInfo = new UserInfo({
 });
 
 const editProfilePopup = document.querySelector("#edit-popup");
-
 const modalTitle = editProfilePopup.querySelector(
   ".popup__input.popup__input_type_name",
 );
@@ -108,10 +107,9 @@ initialCardsRendering.renderItems();
 // New Card Modal
 
 function sendCardForm(inputValues) {
-  renderCard({
-    name: inputValues["place-name"],
-    link: inputValues["link"],
-  });
+  initialCardsRendering.addItem(
+    renderCard({ name: inputValues["place-name"], link: inputValues["link"] }),
+  );
 }
 
 const newCardForm = new PopupWithForm(sendCardForm, "#new-card-popup");
