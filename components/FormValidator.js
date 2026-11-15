@@ -1,4 +1,4 @@
-export class FormValidator {
+class FormValidator {
   constructor(config, formElement) {
     this.config = config;
     this.formElement = formElement;
@@ -49,11 +49,18 @@ export class FormValidator {
         this._toggleButtonState(inputs, saveButton);
       });
     });
-
-    this.formElement.addEventListener("submit", (evt) => {
-      if (!this.formElement.checkValidity()) {
-        evt.preventDefault();
-      }
-    });
   }
 }
+
+function resetFormValidation(formElement, config) {
+  const inputs = formElement.querySelectorAll(config.inputSelector);
+  inputs.forEach((input) => {
+    const errorElement = formElement.querySelector(`#${input.id}-error`);
+    input.classList.remove(config.inputErrorClass);
+    errorElement.textContent = "";
+    errorElement.classList.remove(config.errorClass);
+    input.value = "";
+  });
+}
+
+export { FormValidator, resetFormValidation };
